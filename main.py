@@ -36,3 +36,7 @@ def decode(ids):
     return " ".join(itos[i] for i in ids)
 
 data = torch.tensor(encode(text), dype=torch.long)
+
+n = int(0.9*len(data))
+train_data = data[:n]
+val_data = data[n:]
