@@ -43,3 +43,6 @@ val_data = data[n:]
 
 batch_size = 32
 block_size = 64
+
+def get_batch(split):
+    ...
