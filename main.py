@@ -19,3 +19,7 @@ for club in clubs:
         print(f"NOT FOUND: {club}  (check the title)")
 with open("football.txt", "w", encoding="utf-8") as f:
     f.write(text)
+
+with open('footbal.txt', 'r') as F:
+    text = F.read
+    print(text[:500])
