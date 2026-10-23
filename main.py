@@ -40,3 +40,6 @@ data = torch.tensor(encode(text), dype=torch.long)
 n = int(0.9*len(data))
 train_data = data[:n]
 val_data = data[n:]
+
+batch_size = 32
+block_size = 64
