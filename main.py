@@ -25,3 +25,7 @@ with open('footbal.txt', 'r') as F:
     print(text[:500])
 
 words = text.split()
+
+vocab = sorted(set(words))
+stoi = {w: idx for idx, w in enumerate(vocab)}
+itos = {idx: w for w, idx in stoi.items()}
