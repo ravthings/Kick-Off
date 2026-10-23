@@ -10,3 +10,5 @@ wiki = wikipediaapi.Wikipedia(
 )
 clubs = ["FC Barcelona", "Manchester City F.C", "Liverpool F.C.", "Real Madrid CF"]
 text = ""
+for club in clubs:
+    ...
