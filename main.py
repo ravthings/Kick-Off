@@ -23,3 +23,5 @@ with open("football.txt", "w", encoding="utf-8") as f:
 with open('footbal.txt', 'r') as F:
     text = F.read
     print(text[:500])
+
+words = text.split()
