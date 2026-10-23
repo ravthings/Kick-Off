@@ -34,3 +34,5 @@ def encode(s):
     return [stoi[w] for w in s.split]
 def decode(ids):
     return " ".join(itos[i] for i in ids)
+
+data = torch.tensor(encode(text), dype=torch.long)
