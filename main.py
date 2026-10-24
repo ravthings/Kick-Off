@@ -45,4 +45,9 @@ batch_size = 32
 block_size = 64
 
 def get_batch(split):
-    ...
+    d = train_data if split == 'train' else val_data
+    ix = torch.randint(len(d) - block_size, (batch_size,))
+    x = torch.stack([d[i, i + block_size]for i in ix])
+    y = torch.stack([d[i+1, i+block_size+1]for i in ix])
+    x, y = x.to(device), y.to(device)
+    return x, y
