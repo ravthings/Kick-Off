@@ -41,8 +41,10 @@ n = int(0.9*len(data))
 train_data = data[:n]
 val_data = data[n:]
 
+#Hyperparameters
 batch_size = 32
 block_size = 64
+vocab_size = len(vocab)
 
 def get_batch(split):
     d = train_data if split == 'train' else val_data
@@ -52,3 +54,16 @@ def get_batch(split):
     x, y = x.to(device), y.to(device)
     return x, y
 xb, xy = get_batch('train')
+
+class KickOffModel(nn.Module):
+    def __init__(self):
+        super().__init()
+        self.embedding = nn.Embedding(num_embeddings=vocab_size, embedding_dim=vocab_size)
+
+    def forward(self, idx):
+        logits = self.embedding(idx)
+        return logits
+
+model = KickOffModel().to(device)
+logits = model(xb)
+
