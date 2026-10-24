@@ -51,3 +51,4 @@ def get_batch(split):
     y = torch.stack([d[i+1, i+block_size+1]for i in ix])
     x, y = x.to(device), y.to(device)
     return x, y
+xb, xy = get_batch('train')
