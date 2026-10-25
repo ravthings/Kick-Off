@@ -67,3 +67,6 @@ class KickOffModel(nn.Module):
 model = KickOffModel().to(device)
 logits = model(xb)
 
+loss_fn = nn.CrossEntropyLoss()
+optimizer = torch.optim.AdamW(params=model.parameters(), lr=1e-2)
+
