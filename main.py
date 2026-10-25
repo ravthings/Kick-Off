@@ -20,9 +20,8 @@ for club in clubs:
 with open("football.txt", "w", encoding="utf-8") as f:
     f.write(text)
 
-with open('footbal.txt', 'r') as F:
+with open('football.txt', 'r') as F:
     text = F.read
-    print(text[:500])
 
 words = text.split()
 
@@ -53,7 +52,7 @@ def get_batch(split):
     y = torch.stack([d[i+1, i+block_size+1]for i in ix])
     x, y = x.to(device), y.to(device)
     return x, y
-xb, xy = get_batch('train')
+xb, yb = get_batch('train')
 
 class KickOffModel(nn.Module):
     def __init__(self):
@@ -70,4 +69,8 @@ logits = model(xb)
 loss_fn = nn.CrossEntropyLoss()
 optimizer = torch.optim.AdamW(params=model.parameters(), lr=1e-2)
 model.load_state_dict(torch.load("kickoff.pth"))
+
+B, T, C = logits.shape
+loss = loss_fn(logits.view(B*T + C), yb.view(B*T))
+print(loss.item())
 
