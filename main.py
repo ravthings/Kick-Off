@@ -21,7 +21,7 @@ with open("football.txt", "w", encoding="utf-8") as f:
     f.write(text)
 
 with open('football.txt', 'r') as F:
-    text = F.read
+    text = F.read()
 
 words = text.split()
 
@@ -30,11 +30,11 @@ stoi = {w: idx for idx, w in enumerate(vocab)}
 itos = {idx: w for w, idx in stoi.items()}
 
 def encode(s):
-    return [stoi[w] for w in s.split]
+    return [stoi[w] for w in s.split()]
 def decode(ids):
     return " ".join(itos[i] for i in ids)
 
-data = torch.tensor(encode(text), dype=torch.long)
+data = torch.tensor(encode(text), dtype=torch.long)
 
 n = int(0.9*len(data))
 train_data = data[:n]
@@ -48,15 +48,15 @@ vocab_size = len(vocab)
 def get_batch(split):
     d = train_data if split == 'train' else val_data
     ix = torch.randint(len(d) - block_size, (batch_size,))
-    x = torch.stack([d[i, i + block_size]for i in ix])
-    y = torch.stack([d[i+1, i+block_size+1]for i in ix])
+    x = torch.stack([d[i: i + block_size]for i in ix])
+    y = torch.stack([d[i+1: i+block_size+1]for i in ix])
     x, y = x.to(device), y.to(device)
     return x, y
 xb, yb = get_batch('train')
 
 class KickOffModel(nn.Module):
     def __init__(self):
-        super().__init()
+        super().__init__()
         self.embedding = nn.Embedding(num_embeddings=vocab_size, embedding_dim=vocab_size)
 
     def forward(self, idx):
@@ -71,6 +71,19 @@ optimizer = torch.optim.AdamW(params=model.parameters(), lr=1e-2)
 model.load_state_dict(torch.load("kickoff.pth"))
 
 B, T, C = logits.shape
-loss = loss_fn(logits.view(B*T + C), yb.view(B*T))
+loss = loss_fn(logits.view(B*T, C), yb.view(B*T))
 print(loss.item())
 
+epochs = 1000
+for epoch in range(epochs):
+    model.train()
+
+    logits = model(xb)
+    B, T, C = logits.shape()
+    loss = loss_fn(logits.view(B*T, C), yb.view(B*T))
+    optimizer.zero_grad()
+    loss.backward()
+    optimizer.step()
+
+    if epoch == 100 % 0:
+        print(loss.item())
