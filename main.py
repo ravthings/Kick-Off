@@ -69,4 +69,5 @@ logits = model(xb)
 
 loss_fn = nn.CrossEntropyLoss()
 optimizer = torch.optim.AdamW(params=model.parameters(), lr=1e-2)
+model.load_state_dict(torch.load("kickoff.pth"))
 
