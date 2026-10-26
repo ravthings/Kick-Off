@@ -87,10 +87,15 @@ def generate(model, idx, max_new_tokens):
 training = input("Do you want to train the model? y/n ")
 
 if training == "y":
-    model.load_state_dict(torch.load("kickoff.pth"))
+    if os.path.exists("kickoff.pth"):
+        model.load_state_dict(torch.load("kickoff.pth", map_location=device))
+        print("Resuming from saved model")
+    else:
+        print("No saved model, training from scratch")
     epochs = 1000
     for epoch in range(epochs):
         model.train()
+        xb, yb = get_batch('train')
 
         logits = model(xb)
         B, T, C = logits.shape
