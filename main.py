@@ -104,4 +104,7 @@ def generate(model, idx, max_new_tokens):
         next_word = torch.multinomial(probs, num_samples=1)
         idx = torch.cat((idx, next_word), dim=1)
     return idx
+start = torch.tensor([encode("Liverpool")], device=device)
+out = generate(model, start, max_new_tokens=50)
+print(decode(out[0].tolist()))
 
