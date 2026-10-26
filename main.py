@@ -10,7 +10,7 @@ if not os.path.exists("football.txt"):
         user_agent="kickoff-football-bot/1.0 (aaravgarg1011@gmail.com)",  # Wikipedia requires this
         language="en",
     )
-    clubs = ["FC Barcelona", "Manchester City F.C", "Liverpool F.C.", "Real Madrid CF"]
+    clubs = ["FC Barcelona", "Manchester City F.C.", "Liverpool F.C.", "Real Madrid CF"]
     text = ""
     for club in clubs:
         page = wiki.page(club)
@@ -19,8 +19,8 @@ if not os.path.exists("football.txt"):
             print(f"Got {club}: {len(page.text)} chars")
         else:
             print(f"NOT FOUND: {club}  (check the title)")
-with open("football.txt", "w", encoding="utf-8") as f:
-    f.write(text)
+    with open("football.txt", "w", encoding="utf-8") as f:
+        f.write(text)
 
 with open('football.txt', 'r') as F:
     text = F.read()
@@ -70,15 +70,24 @@ logits = model(xb)
 
 loss_fn = nn.CrossEntropyLoss()
 optimizer = torch.optim.AdamW(params=model.parameters(), lr=1e-2)
-model.load_state_dict(torch.load("kickoff.pth"))
 
 B, T, C = logits.shape
 loss = loss_fn(logits.view(B*T, C), yb.view(B*T))
 print(loss.item())
 
-training = input("Do you want to train the model? y/n")
+def generate(model, idx, max_new_tokens):
+    for _ in range(max_new_tokens):
+        logits = model(idx)
+        logits = logits[:, -1, :]
+        probs = torch.softmax(logits, dim=-1)
+        next_word = torch.multinomial(probs, num_samples=1)
+        idx = torch.cat((idx, next_word), dim=1)
+    return idx
+
+training = input("Do you want to train the model? y/n ")
 
 if training == "y":
+    model.load_state_dict(torch.load("kickoff.pth"))
     epochs = 1000
     for epoch in range(epochs):
         model.train()
@@ -91,8 +100,15 @@ if training == "y":
         optimizer.step()
 
         if epoch % 100 == 0:
-            print(loss.item())
+            print(f"Epoch: {epoch}, Loss: {loss.item()}")
+    torch.save(model.state_dict(), "kickoff.pth")
+    start = torch.tensor([encode("Liverpool")], device=device)
+    out = generate(model, start, max_new_tokens=50)
+    print(decode(out[0].tolist()))
+            
+
 elif training == "n":
+    model.load_state_dict(torch.load("kickoff.pth"))
     model.eval()
     with torch.inference_mode():
         xb, yb = get_batch("val")
@@ -101,14 +117,7 @@ elif training == "n":
         loss = loss_fn(y_logits.view(B*T, C), yb.view(B*T))
         print(f"val_loss = {loss.item()}")
 
-    def generate(model, idx, max_new_tokens):
-        for _ in range(max_new_tokens):
-            logits = model(idx)
-            logits = logits[:, -1, :]
-            probs = torch.softmax(logits, dim=-1)
-            next_word = torch.multinomial(probs, num_samples=1)
-            idx = torch.cat((idx, next_word), dim=1)
-        return idx
+
     start = torch.tensor([encode("Liverpool")], device=device)
     out = generate(model, start, max_new_tokens=50)
     print(decode(out[0].tolist()))
