@@ -95,3 +95,6 @@ with torch.inference_mode():
     B, T, C = y_logits.shape
     loss = loss_fn(y_logits.view(B*T, C), yb.view(B*T))
     print(f"val_loss = {loss.item()}")
+
+def generate(model, idx, max_new_tokens):
+    ...
