@@ -97,4 +97,11 @@ with torch.inference_mode():
     print(f"val_loss = {loss.item()}")
 
 def generate(model, idx, max_new_tokens):
-    ...
+    for _ in range(max_new_tokens):
+        logits = model(idx)
+        logits = logits[:, -1, :]
+        probs = torch.softmax(logits, dim=-1)
+        next_word = torch.multinomial(probs, num_samples=1)
+        idx = torch.cat((idx, next_word), dim=1)
+    return idx
+
