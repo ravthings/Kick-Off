@@ -74,37 +74,41 @@ B, T, C = logits.shape
 loss = loss_fn(logits.view(B*T, C), yb.view(B*T))
 print(loss.item())
 
-epochs = 1000
-for epoch in range(epochs):
-    model.train()
+training = input("Do you want to train the model? y/n")
 
-    logits = model(xb)
-    B, T, C = logits.shape
-    loss = loss_fn(logits.view(B*T, C), yb.view(B*T))
-    optimizer.zero_grad()
-    loss.backward()
-    optimizer.step()
+if training == "y":
+    epochs = 1000
+    for epoch in range(epochs):
+        model.train()
 
-    if epoch % 100 == 0:
-        print(loss.item())
+        logits = model(xb)
+        B, T, C = logits.shape
+        loss = loss_fn(logits.view(B*T, C), yb.view(B*T))
+        optimizer.zero_grad()
+        loss.backward()
+        optimizer.step()
 
-model.eval()
-with torch.inference_mode():
-    xb, yb = get_batch("val")
-    y_logits = model(xb)
-    B, T, C = y_logits.shape
-    loss = loss_fn(y_logits.view(B*T, C), yb.view(B*T))
-    print(f"val_loss = {loss.item()}")
+        if epoch % 100 == 0:
+            print(loss.item())
+elif training == "n":
+    model.eval()
+    with torch.inference_mode():
+        xb, yb = get_batch("val")
+        y_logits = model(xb)
+        B, T, C = y_logits.shape
+        loss = loss_fn(y_logits.view(B*T, C), yb.view(B*T))
+        print(f"val_loss = {loss.item()}")
 
-def generate(model, idx, max_new_tokens):
-    for _ in range(max_new_tokens):
-        logits = model(idx)
-        logits = logits[:, -1, :]
-        probs = torch.softmax(logits, dim=-1)
-        next_word = torch.multinomial(probs, num_samples=1)
-        idx = torch.cat((idx, next_word), dim=1)
-    return idx
-start = torch.tensor([encode("Liverpool")], device=device)
-out = generate(model, start, max_new_tokens=50)
-print(decode(out[0].tolist()))
-
+    def generate(model, idx, max_new_tokens):
+        for _ in range(max_new_tokens):
+            logits = model(idx)
+            logits = logits[:, -1, :]
+            probs = torch.softmax(logits, dim=-1)
+            next_word = torch.multinomial(probs, num_samples=1)
+            idx = torch.cat((idx, next_word), dim=1)
+        return idx
+    start = torch.tensor([encode("Liverpool")], device=device)
+    out = generate(model, start, max_new_tokens=50)
+    print(decode(out[0].tolist()))
+else:
+    print("Sorry, that is not a valid input.")
