@@ -87,3 +87,6 @@ for epoch in range(epochs):
 
     if epoch == 100 % 0:
         print(loss.item())
+
+model.eval()
+
