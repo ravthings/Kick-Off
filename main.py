@@ -79,14 +79,19 @@ for epoch in range(epochs):
     model.train()
 
     logits = model(xb)
-    B, T, C = logits.shape()
+    B, T, C = logits.shape
     loss = loss_fn(logits.view(B*T, C), yb.view(B*T))
     optimizer.zero_grad()
     loss.backward()
     optimizer.step()
 
-    if epoch == 100 % 0:
+    if epoch % 100 == 0:
         print(loss.item())
 
 model.eval()
-
+with torch.inference_mode():
+    xb, yb = get_batch("val")
+    y_logits = model(xb)
+    B, T, C = y_logits.shape
+    loss = loss_fn(y_logits.view(B*T, C), yb.view(B*T))
+    print(f"val_loss = {loss.item()}")
