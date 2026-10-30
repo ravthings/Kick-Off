@@ -87,6 +87,9 @@ def generate(model, idx, max_new_tokens):
 training = input("Do you want to train the model? y/n ")
 
 if training == "y":
+    lre = input("What do you want the Learning Rate to be? ")
+    lr = float(lre)
+    optimizer = torch.optim.AdamW(params=model.parameters(), lr=lr)
     if os.path.exists("kickoff.pth"):
         model.load_state_dict(torch.load("kickoff.pth", map_location=device))
         print("Resuming from saved model")
