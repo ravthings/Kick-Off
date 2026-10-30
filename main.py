@@ -116,6 +116,7 @@ if training == "y":
             
 
 elif training == "n":
+    print(f"Train Loss = {loss.item()}")
     model.load_state_dict(torch.load("kickoff.pth"))
     model.eval()
     with torch.inference_mode():
@@ -124,6 +125,7 @@ elif training == "n":
         B, T, C = y_logits.shape
         loss = loss_fn(y_logits.view(B*T, C), yb.view(B*T))
         print(f"val_loss = {loss.item()}")
+        
 
 
     start = torch.tensor([encode("Liverpool")], device=device)
